@@ -1,0 +1,308 @@
+<!-- ============================================
+     Arquivo: index.html
+     -------------------------------------------
+     Este template estende o `base.html` e define o conteúdo principal da aplicação de Análise Ambiental.
+     Ele inclui:
+       - Cabeçalho com indicador de localização, seletor de data, hora e estação.
+       - Área do mapa com hotspots para Meteorologia e Qualidade do Ar.
+       - Views inline:
+         • Sphere View (Qualidade do Ar) com painéis MP2.5, MP10 e PTS.
+         • Meteorologia Data View com abas (Chuva, Vento, Temperatura).
+         • Estatísticas View (Gráfico e Gradiente).
+       - Botões de ação na parte inferior para alternar entre as visualizações.
+       - Script inline para controle de abas da Meteorologia.
+   ============================================ -->
+
+{% extends "base.html" %}
+
+{% block title %}Análise Ambiental{% endblock %}
+
+{% block content %}
+<div class="body-container">
+  <div class="window-container">
+  
+    <!-- Cabeçalho com Itabira + DatePicker + Estação -->
+    <div id="header-overlay-container">
+      <div id="location-indicator">
+        <img id="location-icon-img"
+             src="{{ url_for('static', filename='images/mapa-icon.png') }}"
+             data-map-src="{{ url_for('static', filename='images/mapa-icon.png') }}"
+             data-quality-src="{{ url_for('static', filename='images/qualidade-ar-icon.png') }}"
+             data-meteorologia-src="{{ url_for('static', filename='images/meteorologia-icon.png') }}" 
+             data-estatisticas-src="{{ url_for('static', filename='images/stats.png') }}"
+             alt="Localização"
+             class="pin-icon">
+        <span>Itabira</span>
+      </div>
+      <div id="air-quality-overlay" class="overlay">
+        <form id="classification-form" method="POST" action="/classificar">
+          <div class="form-group">
+            <label for="input_date">Data:</label>
+            <input type="date" id="input_date" name="input_date"
+                   value="{{ selected_date or '2024-12-31' }}"
+                   min="2022-01-01" max="2024-12-31" required>
+          </div>
+          <div class="form-group">
+            <label for="input_hour">Hora:</label>
+            <select id="input_hour" name="input_hour" required>
+              {% for h in range(0, 24) %}
+                {% set hour_val = "%02d"|format(h) %}
+                <option value="{{ hour_val }}"
+                  {% if (selected_hour is defined and selected_hour == hour_val)
+                         or (selected_hour is not defined and h == 23) %}selected{% endif %}>
+                  {{ hour_val }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="station">Estação:</label>
+            <select id="station" name="station" required>
+              <option value="EAMA11" {% if (selected_station is not defined)
+                                         or (selected_station == "EAMA11") %}selected{% endif %}>EAMA11</option>
+              <option value="EAMA21" {% if selected_station == "EAMA21" %}selected{% endif %}>EAMA21</option>
+              <option value="EAMA31" {% if selected_station == "EAMA31" %}selected{% endif %}>EAMA31</option>
+              <option value="EAMA41" {% if selected_station == "EAMA41" %}selected{% endif %}>EAMA41</option>
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Mapa e Views Inline -->
+    <div class="map-container">
+      <!-- Mapa original -->
+      <img id="main-map"
+           src="{{ url_for('static', filename='images/mapa3.webp') }}"
+           alt="Mapa Base"
+           class="map-image">
+    
+      <!-- Meteorologia -->
+      <div class="hotspot"
+           data-image="{{ url_for('static', filename='images/mapaem11.webp') }}"
+           data-action="meteorologia"
+           style="top:66%;left:8%;width:160px;height:140px;"></div>
+    
+      <!-- Qualidade do Ar: EAMA11 -->
+      <div class="hotspot"
+           data-image="{{ url_for('static', filename='images/mapaeama11.webp') }}"
+           data-action="qualidade" 
+           data-station="EAMA11"
+           style="top:66%;left:66%;width:160px;height:160px;"></div>
+    
+      <!-- Qualidade do Ar: EAMA21 -->
+      <div class="hotspot"
+           data-image="{{ url_for('static', filename='images/mapaeama21.webp') }}"
+           data-action="qualidade"
+           data-station="EAMA21"
+           style="top:38%;left:81%;width:160px;height:160px;"></div>
+    
+      <!-- Qualidade do Ar: EAMA31 -->
+      <div class="hotspot"
+           data-image="{{ url_for('static', filename='images/mapaeama31.webp') }}"
+           data-action="qualidade"
+           data-station="EAMA31"
+           style="top:16%;left:78%;width:160px;height:160px;"></div>
+    
+      <!-- Qualidade do Ar: EAMA41 -->
+      <div class="hotspot"
+           data-image="{{ url_for('static', filename='images/mapaeama41.webp') }}"
+           data-action="qualidade"
+           data-station="EAMA41"
+           style="top:30%;left:51%;width:160px;height:160px;"></div>
+      
+      <!-- Inline Sphere View para Qualidade do Ar -->
+      <div id="inline-sphere-view" class="hidden">
+        <button id="btn-back-to-map" class="back-to-map">Voltar ao Mapa</button>
+        <div id="sphere-container"></div>
+        <div id="sphere-overlay">
+          <!-- Conteúdo relativo à Qualidade do Ar -->
+          <div id="basic-info-mp2_5" class="info-panel visible">
+            <h3 class="nowrap">Material Particulado Respirável Fino</h3>
+            {% if result and result.get('MP2.5') and not result["MP2.5"].error %}
+              <p>Média das últimas 24h: {{ "%.2f"|format(result["MP2.5"]["Média Horária"])|replace('.', ',') }} µg/m³</p>
+              <p>
+                IQAr: {{ "%.2f"|format(result["MP2.5"]["IQAr"])|replace('.', ',') }}
+                <span id="iqar-info-trigger-mp25" class="info-button">i</span>
+              </p>
+              <p>Classificação: {{ result["MP2.5"]["Classificação"] }}</p>
+            {% else %}
+              <p>IQAr: Não há registros suficientes.</p>
+            {% endif %}
+            <a href="#" id="more-details-link-mp2_5">Mais detalhes</a>
+            <div id="details-mp2_5" class="details-container">
+              {% if result and result.get('MP2.5') and not result["MP2.5"].error %}
+                <h4>Detalhes MP<sub>2,5</sub></h4>
+                <p>Índice Inicial: {{ "%.2f"|format(result["MP2.5"]["Índice Inicial"])|replace('.', ',') }} µg/m³</p>
+                <p>Índice Final: {{ "%.2f"|format(result["MP2.5"]["Índice Final"])|replace('.', ',') }} µg/m³</p>
+                <p>Concentração Inicial: {{ "%.2f"|format(result["MP2.5"]["Concentração Inicial"])|replace('.', ',') }} µg/m³</p>
+                <p>Concentração Final: {{ "%.2f"|format(result["MP2.5"]["Concentração Final"])|replace('.', ',') }} µg/m³</p>
+              {% else %}
+                <p>Detalhes de MP<sub>2,5</sub> não disponíveis.</p>
+              {% endif %}
+            </div>
+          </div>
+          <div id="basic-info-mp10" class="info-panel hidden">
+                        <h3 class="nowrap">Material Particulado Inalável Grosso</h3>
+            {% if result and result.get('MP10') and not result["MP10"].error %}
+              <p>Média das últimas 24h: {{ "%.2f"|format(result["MP10"]["Média Horária"])|replace('.', ',') }} µg/m³</p>
+              <p>
+                IQAr: {{ "%.2f"|format(result["MP10"]["IQAr"])|replace('.', ',') }}
+                <span id="iqar-info-trigger-mp10" class="info-button">i</span>
+              </p>
+              <p>Classificação: {{ result["MP10"]["Classificação"] }}</p>
+            {% else %}
+              <p>IQAr: Não há registros suficientes.</p>
+            {% endif %}
+            <a href="#" id="more-details-link-mp10">Mais detalhes</a>
+            <div id="details-mp10" class="details-container">
+              {% if result and result.get('MP10') and not result["MP10"].error %}
+                <h4>Detalhes MP<sub>10</sub></h4>
+                <p>Índice Inicial: {{ "%.2f"|format(result["MP10"]["Índice Inicial"])|replace('.', ',') }} µg/m³</p>
+                <p>Índice Final: {{ "%.2f"|format(result["MP10"]["Índice Final"])|replace('.', ',') }} µg/m³</p>
+                <p>Concentração Inicial: {{ "%.2f"|format(result["MP10"]["Concentração Inicial"])|replace('.', ',') }} µg/m³</p>
+                <p>Concentração Final: {{ "%.2f"|format(result["MP10"]["Concentração Final"])|replace('.', ',') }} µg/m³</p>
+              {% else %}
+                <p>Detalhes de MP<sub>10</sub> não disponíveis.</p>
+              {% endif %}
+            </div>
+          </div>
+          <div id="basic-info-pts" class="info-panel hidden">
+                        <h3>Partículas Totais em Suspensão</h3>
+            {% if result and result.get('PTS') and not result["PTS"].error %}
+              <p>Média das últimas 24h: {{ "%.2f"|format(result["PTS"]["Média Horária"])|replace('.', ',') }} µg/m³</p>
+            {% else %}
+              <p>Média das últimas 24h: Não há registros suficientes.</p>
+            {% endif %}
+          </div>
+          <!-- Placeholder para o significado da classificação -->
+          <div id="classification-meaning" class="meaning-text"></div>
+
+        </div>
+        <div id="classification-bar">
+          <div class="classification-segment boa"></div>
+          <div class="classification-segment moderada"></div>
+          <div class="classification-segment ruim"></div>
+          <div class="classification-segment muito-ruim"></div>
+          <div class="classification-segment pessima"></div>
+          <div id="classification-arrow"></div>
+          <span id="classification-label"></span>
+        </div>
+        <div id="sphere-toggle-buttons">
+          <button id="btn-pts" class="toggle-btn">PTS</button>
+          <button id="btn-mp2_5" class="toggle-btn selected">MP<sub>2,5</sub></button>
+          <button id="btn-mp10" class="toggle-btn">MP<sub>10</sub></button>
+        </div>
+      </div>
+      
+      <!-- Inline Meteorologia Data View -->
+      <div id="inline-meteorologia-data-view" class="hidden">
+        <button id="btn-back-from-meteorologia-data" class="back-to-map">Voltar ao mapa</button>
+        <div class="meteorologia-content">
+          <div id="meteorologia-wrapper">
+            <div id="meteorologia-tabs">
+              <button class="tab-btn active" data-tab="1">Chuva</button>
+              <button class="tab-btn" data-tab="2">Vento</button>
+              <button class="tab-btn" data-tab="3">Temperatura</button>
+            </div>
+            <div id="meteorologia-info" class="tab-1" style="margin-top: 15px;">
+              <!-- Conteúdo injetado via AJAX -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+ <!-- dentro de <div class="map-container"> -->
+
+<!-- Inline Estatísticas View -->
+<div id="inline-estatisticas-view" class="{% if not graph_html %}hidden{% endif %}">
+  <button id="btn-back-from-estatisticas" class="back-to-map">
+    Voltar ao Mapa
+  </button>
+  <div class="estatisticas-content">
+
+    <!-- (Opcional) Formulário de Métrica -->
+    <div id="stats-form" style="margin-bottom:1rem;">
+      <form id="stats-selector" method="post" action="/">
+        <label for="metric" style="color:#fff; margin-right:.5rem;">Métrica:</label>
+        <select name="metric" id="metric" onchange="this.form.submit()">
+          <option value="mp10"
+            {% if metric is not defined or metric=='mp10' %}
+              selected
+            {% endif %}>
+          MP10
+          </option>
+          <option value="mp2.5"
+            {% if metric=='mp2.5' %}
+              selected
+            {% endif %}>
+          MP2.5
+          </option>
+        </select>
+      </form>
+    </div>
+
+    {# Região do Gráfico (só aparece se graph_html contiver algo) #}
+    <div id="estatisticas-plot" class="{% if not graph_html %}hidden{% endif %}">
+      {{ graph_html|default('')|safe }}
+    </div>
+  
+    {# Região do Gradiente (sempre disponível) #}
+    <div id="estatisticas-gradient" class="hidden" style="
+         position:absolute; inset:0;
+         background:#272727;
+         display:flex;
+         justify-content:center;
+         align-items:center;
+         z-index:2;">
+      {% if gradient_url %}
+        <img src="{{ gradient_url }}"        class="estatisticas-gradient-img media" alt="Gradiente Média">
+        <img src="{{ gradient_max_url }}"    class="estatisticas-gradient-img max"   alt="Gradiente Máx" style="display:none">
+        <img src="{{ gradient_min_url }}"    class="estatisticas-gradient-img min"   alt="Gradiente Mín" style="display:none">
+      {% else %}
+        <p style="color:white;">(Falha ao gerar gradiente.)</p>
+      {% endif %}
+    </div>
+  
+    {# Botões de alternância (sempre no DOM) #}
+    <div class="estatisticas-buttons">
+      <button id="btn-estatisticas-graph"
+              class="toggle-btn {% if graph_html %}active{% endif %}">
+        Gráfico
+      </button>
+      <button id="btn-estatisticas-gradient"
+              class="toggle-btn {% if not graph_html %}active{% endif %}">
+        Gradiente
+      </button>
+    </div>
+  </div>
+</div>
+ 
+  </div>
+  <div class="action-buttons">
+    <span class="visualization-label">Explorar Dados:</span>
+    <button id="btn-meteorologia">Meteorologia</button>
+    <button id="btn-qualidade-ar">Qualidade do Ar</button>
+    <button id="btn-estatisticas">Estatísticas</button>
+  </div>
+  
+  </div>
+</div>
+
+<!-- Script inline para controle das abas de Meteorologia -->
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  var tabButtons = document.querySelectorAll("#meteorologia-tabs .tab-btn");
+  tabButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabButtons.forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      var tab = btn.getAttribute("data-tab");
+      var infoDiv = document.getElementById("meteorologia-info");
+      infoDiv.classList.remove("tab-1", "tab-2", "tab-3");
+      infoDiv.classList.add("tab-" + tab);
+    });
+  });
+});
+</script>
+{% endblock %}

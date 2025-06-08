@@ -1,0 +1,157 @@
+/**
+ * ====================================================================
+ * Arquivo: components.css
+ * --------------------------------------------------------------------
+ * Estilos para:
+ * - Barra de classificação de qualidade do ar (segmentos coloridos, rótulos e seta indicadora)
+ * - Botões de alternância e abas (.toggle-btn, .tab-btn, #btn-pts)
+ * - Contêineres de controle da esfera e abas de meteorologia
+ * ====================================================================
+ */
+
+/* Container absoluto da barra de classificação */
+#classification-bar {
+  position: absolute;
+  top: 16%;
+  left: 6%;
+  width: 7px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  z-index: 120;
+  transition: width .2s ease;
+  box-shadow: 2px 0 4px rgba(0,0,0,.3);
+}
+
+/* Cada segmento colorido representa um nível de qualidade */
+.classification-segment {
+  flex: 1;
+  position: relative;
+  background-color: #ccc;
+}
+.classification-segment.boa         { background: #006b3d }
+.classification-segment.moderada    { background: #069c56 }
+.classification-segment.ruim        { background: #ff980e }
+.classification-segment.muito-ruim { background: #ff681e }
+.classification-segment.pessima     { background: #d3212c }
+
+/* Rótulos rotacionados (ocultos por padrão)*/
+.classification-segment::before {
+  position: absolute;
+  left: 50%;
+  transform-origin: center;
+  text-align: center;
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0s;
+}
+
+/**
+ * Cada rótulo é rotacionado em -90° e posicionado junto ao segmento correspondente:
+ * - top: define a altura percentual do rótulo dentro da barra (50% para o meio, 55% um pouco abaixo, 60% mais abaixo)
+ * - translateX(calc(-50% - 20px)): desloca o rótulo para a esquerda, centralizando-o fora da barra e adicionando 20px de espaçamento
+ * - translateY(-70%): ajusta a posição vertical para que o rótulo fique alinhado ao centro visual do segmento
+ */
+.boa::before         { content: "BOA";        top: 50%; transform: translate(calc(-50% - 20px), -70%) rotate(-90deg) }
+.moderada::before    { content: "MODERADA";   top: 55%; transform: translate(calc(-50% - 20px), -60%) rotate(-90deg) }
+.ruim::before        { content: "RUIM";       top: 50%; transform: translate(calc(-50% - 20px), -70%) rotate(-90deg) }
+.muito-ruim::before  { content: "MUITO RUIM"; top: 55%; transform: translate(calc(-50% - 20px), -70%) rotate(-90deg) }
+.pessima::before     { content: "PÉSSIMA";    top: 60%; transform: translate(calc(-50% - 20px), -70%) rotate(-90deg) }
+
+#classification-bar:hover .classification-segment::before {
+  opacity: 1;
+}
+
+/* Seta indicadora que acompanha a classificação */
+#classification-arrow {
+  position: absolute;
+  right: 100%;
+  top: 0;
+  width: 15px;
+  height: 15px;
+  transform: translateY(-10px);
+  background: url("data:image/svg+xml,%3Csvg…%3E") no-repeat center/contain;
+  transition: top .2s ease;
+  filter: drop-shadow(-1px 1px 1px #000);
+}
+
+/* Rótulo fixo ao lado da seta */
+#classification-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/**
+ * Botões de alternância e abas
+ * - .toggle-btn para alternar modos
+ * - .tab-btn para navegação por abas
+ */
+.toggle-btn,
+.tab-btn {
+  padding: 5px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 5px;
+  border: 1px solid rgb(39,39,39);
+  background-color: rgb(39,39,39);
+  color: #fff;
+  position: relative;
+  top: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.5);
+  border-radius: 6px;
+}
+.toggle-btn:hover:not(.selected),
+.tab-btn:hover:not(.active) {
+  background-color: #555;
+}
+.toggle-btn.selected,
+.tab-btn.active {
+  background-color: #555;
+  border-color: #555;
+}
+
+/* Ajuste específico para o botão de "pts" */
+#btn-pts {
+  min-height: 31px;
+}
+
+/* Contêiner dos botões de alternância da esfera */
+#sphere-toggle-buttons {
+  position: absolute;
+  bottom: -11px;
+  left: 20px;
+  z-index: 100;
+  background: transparent;
+  padding: 10px;
+}
+
+/* Ajusta a posição do botão de pts dentro de sphere e meteorologia (bts foi reaproveitado,
+   não é uma variável meteorológica
+*/
+#sphere-toggle-buttons #btn-pts,
+#meteorologia-tabs #btn-pts {
+  top: 7px;
+}
+
+/* Contêiner dos botões de abas da meteorologia */
+#meteorologia-tabs {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  gap: 5px;
+  background: transparent;
+  padding: 10px;
+  border-radius: 6px;
+}

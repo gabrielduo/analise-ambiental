@@ -1,0 +1,238 @@
+<!-- explicacao_meteorologia -->
+<h3>Meteorologia</h3>
+
+<section id="chuva">
+  <h4>1. Chuva</h4>
+
+  <p>
+    De acordo com o Glossário Meteorológico do INMET, a 
+    <strong>precipitação pluviométrica</strong> corresponde ao volume de água que cai em forma de chuva, medido em milímetros (mm). 
+    A <strong>umidade relativa do ar</strong> é definida como a razão entre a quantidade de vapor d’água presente no ar e a máxima que ele pode conter à mesma temperatura.  
+    Valores inferiores a 5 mm são classificados como chuva leve; entre 6 mm e 15 mm, como chuva moderada; de 16 mm a 49 mm, como chuva forte; e acima de 50 mm, como chuva muito intensa, capaz de provocar alagamentos e erosão do solo.  
+    Em termos de conforto humano, umidade relativa abaixo de 30 % costuma causar sensação de secura na respiração, enquanto valores acima de 80 % podem gerar desconforto térmico e sensação de abafamento.
+  </p>
+
+  <p>
+    Na nossa visualização, apresentamos esses dados de forma clara e intuitiva:
+  </p>
+
+  <ul>
+    <li>
+      <strong>Exemplo de dados:</strong> imagine que uma estação meteorológica registre 
+      <span style="font-weight: bold;">6 mm</span> de chuva e <span style="font-weight: bold;">86 %</span> de umidade relativa.
+    </li>
+    <li>
+      <strong>Representação gráfica:</strong> 
+      – o valor “6 mm” aparece em destaque ao lado de uma nuvem que evidencia a intensidade de chuva moderada.  
+      <br>
+      – a porcentagem “86 %” é exibida próxima a um ícone de planta cuja cor varia conforme o teor de umidade (quanto mais escuro, maior a umidade).
+    </li>
+    <li>
+      <strong>Combinação de texto e ícones:</strong> ao observar a tela, o usuário identifica imediatamente:
+      <br>
+      • “6 mm” à esquerda, indicando chuva moderada.  
+      <br>
+      • “86 %” à direita, sinalizando alto teor de umidade.  
+      <br>
+      • A nuvem estilizada reforça visualmente que houve precipitação recente.  
+      <br>
+      • A variação de cor no ícone de planta permite avaliar, de um relance, se o ar está muito úmido (verde mais intenso) ou relativamente seco (verde mais claro).
+    </li>
+  </ul>
+
+  <p>
+    A seguir, um exemplo ilustrativo desse cenário de <strong>6 mm de chuva</strong> e <strong>86 % de umidade</strong>:
+    <br><br>
+    <img 
+      src="{{ url_for('static', filename='images/exemplo-met1.gif') }}" 
+      alt="Visualização: 6 mm de chuva e 86 % de umidade" 
+      style="max-width: 100%; border-radius: 8px;"
+    />
+  </p>
+
+  <p>
+    Em um segundo cenário, considere que a estação registre 
+    <span style="font-weight: bold;">2 mm</span> de chuva e 
+    <span style="font-weight: bold;">45 %</span> de umidade relativa.  
+    Isso representa chuva leve (2 mm) e umidade moderada (45 %).  
+    Na visualização:
+    <ul>
+      <li>O valor “2 mm” aparecerá em destaque, e a nuvem será sutil, indicando intensidade de chuva muito baixa;</li>
+      <li>O valor “45 %” será acompanhado por um ícone de planta em tonalidade mais clara, refletindo umidade moderada;</li>
+      <li>A combinação aponta condições relativamente secas, favoráveis a atividades ao ar livre sem risco de estiagem severa.</li>
+    </ul>
+  </p>
+
+  <p>
+    Veja abaixo a ilustração desse segundo caso <strong>(2 mm de chuva</strong>  e <strong>45 % de umidade):</strong>
+    <br><br>
+    <img 
+      src="{{ url_for('static', filename='images/exemplo-met2.webp') }}" 
+      alt="Visualização: 2 mm de chuva e 45 % de umidade" 
+      style="max-width: 100%; border-radius: 8px;"
+    />
+  </p>
+
+  <p>
+    Ao selecionar “Chuva” no menu, a interface exibe:
+    <ol>
+      <li>O valor numérico de precipitação (em mm) e umidade (em %) em texto de alta legibilidade.</li>
+      <li>Um ícone de nuvem cuja aparência reflete a intensidade da chuva registrada.</li>
+      <li>Um ícone de planta com coloração dinâmica, indicando o grau de umidade relatado.</li>
+      <li>A combinação de texto e gráficos auxilia o usuário a interpretar rapidamente as condições meteorológicas no momento.</li>
+    </ol>
+  </p>
+</section>
+
+
+<section id="vento">
+  <h4>2. Vento</h4>
+
+  <p>
+    Segundo o Glossário Meteorológico do INMET, a <strong>direção do vento</strong> é indicada em graus, adotando-se a rosa-dos-ventos clássica: 
+    0° (Norte), 90° (Leste), 180° (Sul) e 270° (Oeste). A direção horária do vento corresponde à média dos setores de vento nos últimos 10 minutos antes de cada hora cheia, 
+    sendo fundamental para compreender a dispersão de aerossóis, poluentes e odores em função da topografia e das configurações urbanas.  
+  </p>
+  <p>
+    A <strong>velocidade escalar do vento</strong> mede a rapidez do ar em direção horizontal, expressa em metros por segundo (m/s).  
+    Valores abaixo de 3 m/s são considerados vento fraco, entre 3 m/s e 6 m/s vento moderado, e acima de 6 m/s vento forte.  
+    Ventos acima de 10 m/s podem causar queda de galhos, aumentar a sensação térmica e representar risco para estruturas leves.
+  </p>
+
+  <p>
+    Na nossa visualização, apresentamos esses dados de modo claro e objetivo:
+  </p>
+  <ul>
+    <li>
+      <strong>Exemplo de dados:</strong> imagine que, em uma estação meteorológica, os sensores registraram 
+      <span style="font-weight: bold;">44°</span> de direção e <span style="font-weight: bold;">4 m/s</span> de velocidade.
+    </li>
+    <li>
+      <strong>Representação gráfica:</strong> 
+      – um mostrador circular (rosa-dos-ventos), no qual a agulha aponta para 44° (Nordeste).  
+      <br>
+      – o valor “4.0 m/s” aparece em destaque no centro do mostrador, indicando vento moderado.
+    </li>
+    <li>
+      <strong>Combinação de texto e gráfico:</strong> ao olhar para a tela, o usuário percebe imediatamente:
+      <br>
+      • “44°” à esquerda, indicando direção Nordeste.  
+      <br>
+      • “4 m/s” abaixo, sinalizando intensidade moderada.  
+      <br>
+      • A agulha do mostrador aponta para o quadrante Nordeste, reforçando visualmente a direção.  
+      <br>
+      • A escala circular ao redor mostra as principais direções (N, E, S, W) e subdivisões, facilitando a leitura.
+    </li>
+  </ul>
+
+  <p>
+    A seguir, um exemplo ilustrativo desse cenário de <strong>44°</strong> de direção e <strong>4 m/s</strong> de velocidade:
+    <br><br>
+    <img
+      src="{{ url_for('static', filename='images/exemplo-met3.webp') }}"
+      alt="Visualização: direção 44° e velocidade 4 m/s"
+      style="max-width: 100%; border-radius: 8px;"
+    />
+  </p>
+
+  <p>
+    Assim, ao selecionar “Vento” no menu, você obtém:
+    <ol>
+      <li>O valor numérico de direção (em graus) e velocidade (em m/s) exibidos em destaque para fácil leitura.</li>
+      <li>Um mostrador circular que aponta exatamente para a direção medida, com subdivisões para orientar o usuário.</li>
+      <li>O valor de velocidade centralizado, indicando claramente se o vento é fraco, moderado ou forte.</li>
+      <li>A combinação de texto e gráfico orienta rapidamente sobre as condições atmosféricas de vento no momento.</li>
+    </ol>
+  </p>
+</section>
+
+
+<section id="temperatura">
+  <h4>3. Temperatura</h4>
+
+  <p>
+    De acordo com o Glossário Meteorológico do INMET, a <strong>temperatura do ar</strong> expressa o grau de calor ou frio do ambiente, medido em graus Celsius (°C).  
+    Esse parâmetro reflete o balanço entre radiação solar, radiação terrestre, convecção e condução.  
+    Tecnicamente, é registrada em abrigo padronizado para garantir comparabilidade entre estações.  
+    Valores acima de 30 °C podem causar desconforto térmico, risco de insolação e agravar problemas cardiovasculares,  
+    enquanto temperaturas abaixo de 15 °C podem gerar sensação de frio intenso, influenciando o vestuário e a atividade ao ar livre.
+  </p>
+
+  <p>
+    Na nossa visualização, apresentamos a temperatura de forma direta e intuitiva:
+  </p>
+  <ul>
+    <li>
+      <strong>Exemplo de dados:</strong> suponha que, em uma estação meteorológica, foi registrada  
+      <span style="font-weight: bold;">29 °C</span> no momento da leitura.
+    </li>
+    <li>
+      <strong>Representação gráfica:</strong> utilizamos um termômetro vertical colorido,  
+      cujo líquido interno varia do azul (mais frio) ao laranja/vermelho (mais quente).  
+      A marcação “29 °C” aparece destacada ao lado do bulbo, indicando claramente o valor medido.
+    </li>
+    <li>
+      <strong>Combinação de texto e gráfico:</strong> ao selecionar “Temperatura” no menu, o usuário enxerga:
+      <br>
+      • O texto “29 °C” em destaque, indicando um dia quente.  
+      <br>
+      • O termômetro mostra a coluna de cor atingindo o nível correspondente a 29 °C (ângulo superior ao meio),  
+        reforçando visualmente o grau de calor.  
+      <br>
+      • O bulbo azul escuro na base contrasta com a coluna colorida, sinalizando o ponto de partida (0 °C).
+    </li>
+  </ul>
+
+  <p>
+    Veja abaixo o exemplo ilustrando <strong>29 °C</strong>:
+    <br><br>
+    <img
+      src="{{ url_for('static', filename='images/exemplo-met4.webp') }}"
+      alt="Termômetro ilustrativo para temperatura de 29 °C"
+      style="max-width: 100%; border-radius: 8px;"
+    />
+  </p>
+
+  <p>
+    Em outro cenário, imagine que a estação registre  
+    <span style="font-weight: bold;">15 °C</span>, representando uma manhã fresca:
+    <br><br>
+    <img
+      src="{{ url_for('static', filename='images/exemplo-met5.webp') }}"
+      alt="Termômetro ilustrativo para temperatura de 15 °C"
+      style="max-width: 100%; border-radius: 8px;"
+    />
+  </p>
+
+  <p>
+    Assim, ao acessar a aba “Temperatura” você obtém:
+    <ol>
+      <li>O valor numérico em °C exibido em texto branco, imediatamente legível.</li>
+      <li>Um termômetro vertical colorido, que mostra se a temperatura está baixa (azul) ou alta (vermelho).</li>
+      <li>A marcação precisa ao lado do termômetro, indicando com exatidão o valor medido.</li>
+      <li>A combinação de texto e ícone permite entender em segundos se o dia está frio (por exemplo, 15 °C)  
+          ou quente (por exemplo, 29 °C), auxiliando no planejamento de atividades externas.</li>
+    </ol>
+  </p>
+</section>
+
+
+<h3 id="referencias">Referências</h3>
+<ol style="padding-left: 1.2em; font-size: 15px;">
+  <li id="ref-glossario-chuva">
+    INMET – Glossário Meteorológico. “Chuva”. Disponível em: <a href="https://portal.inmet.gov.br/glossario/glossario#C">...#C</a>.
+  </li>
+  <li id="ref-glossario-umidade">
+    INMET – Glossário Meteorológico. “Umidade Relativa do Ar”. Disponível em: <a href="https://portal.inmet.gov.br/glossario/glossario#U">...#U</a>.
+  </li>
+  <li id="ref-glossario-direcao-vento">
+    INMET – Glossário Meteorológico. “Direção do Vento, Horária (°)”. Disponível em: <a href="https://portal.inmet.gov.br/glossario/glossario#D">...#D</a>.
+  </li>
+  <li id="ref-glossario-velocidade-vento">
+    INMET – Glossário Meteorológico. “Velocidade do Vento Horária (m/s)”. Disponível em: <a href="https://portal.inmet.gov.br/glossario/glossario#V">...#V</a>.
+  </li>
+  <li id="ref-glossario-temperatura">
+    INMET – Glossário Meteorológico. “Temperatura”. Disponível em: <a href="https://portal.inmet.gov.br/glossario/glossario#T">...#T</a>.
+  </li>
+</ol>

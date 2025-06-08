@@ -1,0 +1,225 @@
+/**
+ * ====================================================================
+ * Arquivo: modals.css
+ * --------------------------------------------------------------------
+ * Estilos para:
+ * - Modais full-screen genéricos, meteorologia e IQAr (.modal, #meteorologia-modal, #iqar-modal)
+ * - Conteúdo dos modais e seus tamanhos específicos (.modal-content, #meteorologia-modal-content, #iqar-modal-content, #sphere-modal-content)
+ * - Painéis de informação dinâmicos e links de “mais detalhes” (.info-panel, .details-container, #more-details-link-*)
+ * - Disparadores de informação e botões de ajuda (.iqar-info-trigger, .info-button)
+ * - Caixa de texto de significado (.meaning-text)
+ * ====================================================================
+ */
+/* Contêiner de fundo semitransparente para todos os modais, centralizando conteúdo */
+.modal,#meteorologia-modal,#iqar-modal {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1200
+}
+
+/* Estilos genéricos para o conteúdo de um modal (fundo escuro, padding e cantos arredondados) */
+.modal-content {
+  background:rgb(39,39,39);
+  padding:20px;
+  border-radius:8px;
+  max-width:90%;
+  position:relative
+}
+
+/* Conteúdo específico para modais de meteorologia e IQAR, com tamanho fixo e scroll */
+#meteorologia-modal-content,#iqar-modal-content {
+  background:rgb(39,39,39);
+  padding:20px;
+  border-radius:8px;
+  box-sizing:border-box;
+  position:relative;
+  width:810px;
+  height:500px;
+  color:#fff;
+  overflow-y:auto
+}
+
+/* Conteúdo do modal da esfera, usando flexbox para centralizar o canvas */
+#sphere-modal-content {
+  position:relative;
+  background:rgb(39,39,39);
+  padding:5px;
+  border-radius:8px;
+  box-sizing:border-box;
+  width:810px;
+  height:500px;
+  display:flex;
+  justify-content:center;
+  align-items:center
+}
+
+/* Botões de fechar para todos os modais, posicionados no canto superior direito */
+#sphere-modal-close,#meteorologia-modal-close,#iqar-modal-close {
+  position:absolute;
+  top:7px;
+  right:11px;
+  background:transparent;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  padding:5px 10px;
+  font-size:1.5em;
+  z-index:1100
+}
+
+/* Painéis de informação alternáveis, escondidos por padrão e exibidos quando recebem .visible */
+.info-panel,.info-panel.hidden {
+  display:none
+}
+.info-panel.visible {
+  display:block
+}
+
+/* Garante que textos não quebrem linha onde a classe .nowrap for aplicada */
+.nowrap {
+  white-space:nowrap
+}
+
+/* Container para o canvas da esfera, posicionado com margens e deslocamento vertical */
+#sphere-container {
+  position:relative;
+  margin-left:29%;
+  margin-top:5%;
+  width:480px;
+  height:480px;
+  background:transparent;
+  transform:translateY(-30px)
+}
+
+/* Caixa de sobreposição dentro da esfera para exibir informações calculadas*/
+#sphere-overlay {
+  position:absolute;
+  top:12%;
+  left:9%;
+  width:250px;
+  background:transparent;
+  color:#fff;
+  padding:10px;
+  border-radius:4px;
+  font-size:18px;
+  z-index:100;
+  white-space:nowrap
+}
+
+/* Margem inferior para informações básicas de MP2.5, MP10 e PTS */
+#basic-info-mp2_5,
+#basic-info-mp10,
+#basic-info-pts {
+  margin-bottom: 5px;
+}
+
+/* Container de detalhes oculto por padrão, aparece abaixo do link ‘mais detalhes’ */
+.details-container {
+  display: none;
+  margin-top: 2px;
+  border-top: 2px solid #666;
+  padding-top: 1px;
+  width: 90%;
+  font-size: 15px;
+  line-height: .6;
+  white-space: nowrap;
+}
+
+/* Exibe o container de detalhes ao hover sobre o link correspondente ou o próprio container */
+#more-details-link-mp2_5:hover + .details-container,
+#more-details-link-mp10:hover + .details-container,
+.details-container:hover {
+  display: block;
+}
+
+/* Estilo padrão dos links “mais detalhes” */
+#more-details-link-mp2_5,
+#more-details-link-mp10 {
+  color: #999;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* Cor do link “mais detalhes” ao passar o mouse */
+#more-details-link-mp2_5:hover,
+#more-details-link-mp10:hover {
+  color: #ccc;
+}
+
+/* Espaçamento e alinhamento do conteúdo de meteorologia e IQAR */
+.meteorologia-content,
+.iqar-content {
+  margin-top: 20px;
+  text-align: left;
+}
+
+/* Botões inline para disparar painéis de informação */
+.iqar-info-trigger,
+.info-button {
+  display: inline-block;
+  font-weight: bold;
+  color: #fff;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: .9em;
+  margin-left: 5px;
+}
+
+/* Botão específico para disparo de informações IQAR */
+.iqar-info-trigger {
+  background: #007bff;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+/* Estilo genérico de botões de informação */
+.info-button {
+  background: #007BFF;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Container absoluto para texto de significado, posicionado ao lado */
+.meaning-text {
+  position: absolute;
+  top: 36px !important;
+  left: 730px;
+  width: 200px;
+  white-space: normal !important;
+  text-align: justify;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.4;
+  pointer-events: none;
+  z-index: 150;
+}
+
+/* Elemento fantasma para forçar a largura total do container */
+.meaning-text:after {
+  content: "";
+  display: inline-block;
+  width: 100%;
+}
+
+/* Espaçamento entre parágrafos dentro do texto de significado */
+.meaning-text p {
+  margin: 0 0 .5em;
+}
+
+/* Estilo da fonte de origem do significado */
+.meaning-text .meaning-source {
+  display: block;
+  margin-top: .5em;
+  font-size: 12px;
+  color: #ccc;
+  text-align: left;
+}

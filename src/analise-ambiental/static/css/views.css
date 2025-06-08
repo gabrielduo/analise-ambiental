@@ -1,0 +1,1169 @@
+/**
+ * ====================================================================
+ * Arquivo: views.css
+ * --------------------------------------------------------------------
+ * Estilos para modos de exibição e componentes principais de visão:
+ * - Modo Guide, IQAR e Meteorologia: alterna conteúdo inline e oculta o restante
+ * - Containers de visualização inline (#inline-*-view) e tabelas de dados guia/IQAR/meteorologia
+ * - Botões de retorno (#btn-back-from-*) para cada modo
+ * - Layout de mapa e grid de meteorologia (.map-container, .meteorologia-data-grid)
+ * - Blocos de dados meteorológicos (.met-block, .vento-container) e animações de chuva
+ * - Termômetro interativo (#termometer) e bússola (.compass, .compass-content)
+ * - Painel de estatísticas e controles de gráfico (#stats-overlay, .estatisticas-buttons)
+ * - Classes utilitárias (.hidden) e keyframes de animação
+ * - Observação: o código possui redundâncias, 
+ * - Futuramente trabalharei nisso
+ * ====================================================================
+ */
+
+/* Estilos para elementos ocultos */
+.hidden {
+  display: none !important;
+}
+
+/* Estilos para o conteúdo da página no modo guia */
+.guide-mode #page-content > *:not(#inline-guide-view) {
+  display: none !important;
+}
+
+/* Estilos para o conteúdo do guia */
+.guide-mode #inline-guide-view {
+  display: block !important;
+}
+
+/* Estilos para o container de página */
+#page-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Estilos para o botão "Voltar do guia" */
+#btn-back-from-guide {
+  position: fixed;
+  top: 70px;
+  left: 250;
+  z-index: 1000;
+  width: 30px;
+  height: 25px;
+  padding-left: 36px;
+  line-height: 25px;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Estilos para o botão "Voltar do guia" ao passar o mouse */
+#btn-back-from-guide:hover {
+  background: #666;
+}
+
+/* Estilos para o ícone do botão "Voltar do guia" */
+#btn-back-from-guide::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M6 1L3 4l3 3' fill='none' stroke='%23FFF' stroke-width='1'/%3E%3C/svg%3E") no-repeat center;
+  background-size: 90% 90%;
+}
+
+/* Estilos para a seção interna do guia */
+#inline-guide-view .guide-inner {
+  padding-top: 20px;
+}
+
+/* Estilos para os títulos h2 e h3 dentro do guia */
+#inline-guide-view .guide-inner h2,
+#inline-guide-view .guide-inner h3 {
+  margin-top: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+}
+
+/* Estilos para os títulos h4 e h5 dentro do guia */
+#inline-guide-view .guide-inner h4,
+#inline-guide-view .guide-inner h5 {
+  margin-top: 1.5em;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+}
+
+/* Estilos para parágrafos e listas dentro do guia */
+#inline-guide-view .guide-inner p,
+#inline-guide-view .guide-inner ul {
+  line-height: 1.5;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 1em;
+}
+
+/* Estilos para a lista dentro do guia */
+#inline-guide-view .guide-inner ul {
+  list-style: disc outside;
+  padding-left: 1.2em;
+}
+
+/* Estilos para os itens da lista dentro do guia */
+#inline-guide-view .guide-inner li {
+  margin-bottom: 0.5em;
+}
+
+/* Estilos para as colunas da tabela do guia */
+#tabela-guia th:nth-child(1),
+#tabela-guia td:nth-child(1) {
+  width: 15%;
+}
+
+#tabela-guia th:nth-child(2),
+#tabela-guia td:nth-child(2) {
+  width: 10%;
+}
+
+#tabela-guia th:nth-child(3),
+#tabela-guia td:nth-child(3) {
+  width: 75%;
+}
+
+/* Estilos para o botão dentro do guia */
+#inline-guide-view .guide-inner .btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #444;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para o botão dentro do guia ao passar o mouse */
+#inline-guide-view .guide-inner .btn:hover {
+  background: #555;
+}
+
+/* Estilos para ocultar elementos fora do guia e da visualização do IQAr */
+.guide-mode #page-content > *:not(#inline-guide-view),
+.iqar-mode #page-content > *:not(#inline-iqar-view) {
+  display: none !important;
+}
+
+/* Estilos para exibir o conteúdo do guia ou do IQAr */
+.guide-mode #inline-guide-view,
+.iqar-mode #inline-iqar-view {
+  display: block !important;
+}
+
+/* Estilos gerais para as visualizações do guia, IQAr e meteorologia */
+#inline-guide-view,
+#inline-iqar-view,
+#inline-meteorologia-view {
+  width: 1250px !important;
+  max-width: none !important;
+  margin: 40px auto !important;
+  padding: 20px !important;
+  box-sizing: border-box;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #FFF;
+  color: #000;
+}
+
+/* Estilos para o botão "Voltar do IQAr" */
+#btn-back-from-iqar {
+  position: fixed;
+  top: 70px;
+  left: calc((100vw - 1200px) / 2px);
+  z-index: 1000;
+  width: 30px;
+  height: 25px;
+  padding-left: 36px;
+  line-height: 25px;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Estilos para o botão "Voltar do IQAr" ao passar o mouse */
+#btn-back-from-iqar:hover {
+  background: #666;
+}
+
+/* Estilos para o ícone do botão "Voltar do IQAr" */
+#btn-back-from-iqar::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M6 1L3 4l3 3' fill='none' stroke='%23FFF' stroke-width='1'/%3E%3C/svg%3E") no-repeat center;
+  background-size: 90% 90%;
+}
+
+/* Estilos para o título da visualização do IQAr */
+#inline-iqar-view h2 {
+  margin-top: 0;
+  font-size: 24px;
+}
+
+/* Estilos para parágrafos e listas dentro da visualização do IQAr */
+#inline-iqar-view p,
+#inline-iqar-view ul {
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+/* Estilos para as colunas da tabela do IQAr */
+#tabela-iqar th:nth-child(1),
+#tabela-iqar td:nth-child(1) {
+  width: 15%;
+}
+
+#tabela-iqar th:nth-child(2),
+#tabela-iqar td:nth-child(2) {
+  width: 10%;
+}
+
+#tabela-iqar th:nth-child(3),
+#tabela-iqar td:nth-child(3) {
+  width: 75%;
+}
+
+/* Estilos para o botão "Voltar da visualização de meteorologia" */
+#btn-back-from-meteorologia-view {
+  position: fixed;
+  top: 70px;
+  left: 250;
+  z-index: 1000;
+  width: 30px;
+  height: 25px;
+  padding-left: 36px;
+  line-height: 25px;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Estilos para o botão "Voltar da visualização de meteorologia" ao passar o mouse */
+#btn-back-from-meteorologia-view:hover {
+  background: #666;
+}
+
+/* Estilos para o ícone do botão "Voltar da visualização de meteorologia" */
+#btn-back-from-meteorologia-view::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M6 1L3 4l3 3' fill='none' stroke='%23FFF' stroke-width='1'/%3E%3C/svg%3E") no-repeat center;
+  background-size: 90% 90%;
+}
+
+/* Estilos para o título da visualização de meteorologia */
+#inline-meteorologia-view h2 {
+  margin-top: 0;
+  font-size: 24px;
+}
+
+/* Estilos para parágrafos e listas dentro da visualização de meteorologia */
+#inline-meteorologia-view p,
+#inline-meteorologia-view ul {
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+/* Estilos para as colunas da tabela de meteorologia */
+#tabela-meteorologia th:nth-child(1),
+#tabela-meteorologia td:nth-child(1) {
+  width: 15%;
+}
+
+#tabela-meteorologia th:nth-child(2),
+#tabela-meteorologia td:nth-child(2) {
+  width: 10%;
+}
+
+#tabela-meteorologia th:nth-child(3),
+#tabela-meteorologia td:nth-child(3) {
+  width: 75%;
+}
+
+/* Estilos para esconder elementos na visualização de meteorologia */
+.hidden,
+.meteorologia-mode #page-content > *:not(#inline-meteorologia-view),
+.meteorologia-mode .map-container {
+  display: none !important;
+}
+
+/* Estilos para exibir a visualização de meteorologia */
+.meteorologia-mode #inline-meteorologia-view {
+  display: block !important;
+  position: static;
+  margin: 5px auto;
+}
+
+/* Estilos gerais para a visualização de meteorologia */
+#inline-meteorologia-view {
+  background: #FFF;
+  color: #000;
+  padding: 20px;
+  margin: 5px auto;
+  width: 810px;
+  height: 800px;
+  overflow-y: auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: none;
+}
+
+/* Estilos para o botão "Voltar da meteorologia" */
+#btn-back-from-meteorologia {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Estilos para o botão "Voltar da meteorologia" ao passar o mouse */
+#btn-back-from-meteorologia:hover {
+  background: #666;
+}
+
+/* Estilos para os containers relacionados à meteorologia */
+.map-container,
+.meteorologia-data-grid,
+.meteorologia-content {
+  background-color: rgb(39,39,39);
+}
+
+/* Estilos para o container do mapa na visualização de meteorologia */
+.map-container {
+  width: 1200px;
+  height: 560px;
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para o grid de dados de meteorologia */
+.meteorologia-data-grid {
+  display: block;
+  position: relative;
+  width: 1200px;
+  height: 560px;
+  color: #fff;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-top: 0;
+  gap: 0;
+}
+
+/* Estilos para o bloco de dados meteorológicos */
+.met-block {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 20px !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  text-align: left;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  position: relative;
+}
+
+/* Estilos para as labels e valores dentro do bloco meteorológico */
+.met-label-top, 
+.met-value-top, 
+.met-value-bottom, 
+.met-label-bottom {
+  font-weight: normal;
+  text-align: left;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.met-label-bottom {
+  margin-top: 17px;
+  font-weight: bold;
+}
+/* Estilos para a mensagem de erro */
+.met-error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1200px;
+  height: 560px;
+  color: #fff;
+  font-size: 1.1rem;
+  text-align: center;
+  white-space: nowrap;
+  max-width: none;
+  overflow-x: auto;
+  background-color: rgb(39,39,39);
+  box-sizing: border-box;
+}
+
+/* Estilos para o container do vento */
+.vento-container {
+  position: absolute;
+  top: 133%;
+  left: 48%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  background-color: #272727;
+  border-radius: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Estilos para as labels de escala */
+.scale-label {
+  position: absolute;
+  font-size: 12px;
+  color: #5b5b5b;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Estilos para posições específicas das labels de escala */
+.max-umid {
+  top: 4px;
+  left: 65px;
+}
+
+.max-precip {
+  top: 4px;
+  right: 70px;
+}
+
+.max-temp {
+  top: 4px;
+  right: 75px;
+}
+
+/* Estilos para as labels e valores de umidade relativa e temperatura */
+.umidade-relativa-label,
+.umidade-relativa-valor {
+  margin-left: 20px;
+}
+
+.temperatura-label,
+.temperatura-valor {
+  margin-right: 20px;
+}
+
+/* Estilos para a visibilidade dos itens dentro de #meteorologia-info */
+#meteorologia-info .meteorologia-data-grid > * {
+  display: none;
+}
+
+/* Estilos para exibir a informação meteorológica conforme a aba */
+#meteorologia-info.tab-1 .meteorologia-data-grid > *:nth-child(1),
+#meteorologia-info.tab-2 .meteorologia-data-grid > *:nth-child(2),
+#meteorologia-info.tab-3 .meteorologia-data-grid > *:nth-child(3) {
+  display: block;
+  border-radius: 16px;
+}
+
+/* Estilos para a disposição dos itens dentro do bloco meteorológico */
+.met-block .met-label-top {
+  order: 1;
+  margin-right: 10px;
+  flex: 0 0 auto;
+}
+
+.met-block .met-value-top {
+  order: 2;
+  margin-right: 20px;
+  flex: 0 0 auto;
+}
+
+.met-block .met-center-box {
+  order: 3;
+  flex: 1 1 auto;
+  margin: 0 auto;
+}
+
+.met-block .met-value-bottom {
+  order: 4;
+  margin-left: 20px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.met-block .met-label-bottom {
+  order: 5;
+  margin-left: 10px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+/* Estilos para a seção de precipitação */
+.precip-section {
+  position: relative;
+  top: 60px;
+  left: 5%;
+  font-size: 1.2rem;
+}
+
+/* Estilos para o valor superior meteorológico */
+.met-value-top {
+  font-size: 1.6rem;
+}
+
+/* Estilos para a seção de umidade */
+.umidade-section {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  top: 90px;
+  left: 5%;
+  font-size: 1.2rem;
+}
+
+/* Estilos para a label e valor inferior na seção de umidade */
+.umidade-section .met-label-bottom,
+.umidade-section .met-value-bottom {
+  margin-left: 0 !important;
+  order: 1;
+  text-align: left !important;
+}
+
+/* Estilos para as labels e valores meteorológicos */
+.met-label-top,
+.umidade-relativa-label {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.umidade-section .met-value-bottom {
+  font-size: 1.6rem;
+}
+
+.umidade-section .met-label-bottom {
+  font-size: 1.2rem;
+}
+
+/* Estilos para o container centralizado da temperatura */
+.met-center-box.temperatura {
+  position: absolute;
+  top: 280px;
+  left: 47%;
+  transform: translate(-50%,-50%);
+  width: 350px;
+  height: 350px;
+  background-color: rgb(39,39,39);
+  z-index: 0;
+}
+
+/* Estilos para a coluna à esquerda com elementos em linha */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Estilos para as imagens de precipitação e umidade */
+.precip-img,
+.umidade-img {
+  width: 80px;
+  height: auto;
+  margin-top: 10px;
+  display: block;
+}
+
+/* Estilos para o container da chuva */
+.met-center-box.chuva {
+  position: absolute;
+  top: 250px;
+  left: 48%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  height: 350px;
+  background-color: rgb(39, 39, 39);
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para a imagem de precipitação */
+.precip-img {
+  width: 180px;
+  height: auto;
+  margin: 10px 10px 10px 0;
+  filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* Estilos para a imagem de umidade */
+.umidade-img {
+  width: 120px;
+  height: auto;
+  margin: 10px 10px 10px 0;
+  filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* Estilos para esconder o container de chuva quando não há precipitação */
+.met-center-box.chuva.norain .rain-container {
+  display: none;
+}
+
+/* Estilos para o container de chuva */
+.met-center-box.chuva .rain-container {
+  position: absolute;
+  top: 90px;
+  left: 62px;
+  width: 60%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Estilos para a gota de chuva */
+.met-center-box.chuva .rain-drop {
+  position: absolute;
+  bottom: 100%;
+  width: 3px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  opacity: 0;
+  animation: drop-fall 1s linear infinite;
+}
+
+/* Animação de queda das gotas de chuva */
+@keyframes drop-fall {
+  0% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+}
+
+/* Estilos para a intensidade da chuva (leve, média, forte) */
+.met-center-box.chuva.rain-light .rain-drop {
+  animation-duration: 1.3s;
+}
+
+.met-center-box.chuva.rain-medium .rain-drop {
+  animation-duration: 0.9s;
+}
+
+.met-center-box.chuva.rain-heavy .rain-drop {
+  animation-duration: 0.7s;
+}
+
+/* Estilos para o termômetro */
+#termometer {
+  width: 25px;
+  height: 240px;
+  background: #3d3d44;
+  border: 9px solid #323237;
+  border-radius: 20px;
+  position: relative;
+  margin: 0 auto 50px;
+  z-index: 2;
+  box-shadow:
+    inset 0 0 8px rgba(0, 0, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para a base do termômetro */
+#termometer::before {
+  content: "";
+  position: absolute;
+  width: 80% !important;
+  height: calc(2 * 25px / 2 + 13px) !important;
+  bottom: 13px !important;
+  left: 10% !important;
+  background: #3d3d44;
+  z-index: -1;
+}
+
+/* Estilos para a parte inferior do termômetro */
+#termometer::after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background-color: #007bff;
+  border: 9px solid #323237;
+  border-radius: 50%;
+  bottom: -41px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  box-shadow:
+    inset 0 0 6px rgba(0, 0, 0, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para a temperatura do termômetro */
+#termometer #temperature {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(
+    to top,
+    #007bff    0px,
+    #17a2b8   45px,
+    #28a745   86px,
+    #ffc107  124px,
+    #fd7e14  152px,
+    #dc3545  240px
+  ) no-repeat bottom;
+  background-size: 100% 100%;
+  box-shadow: none;
+  transition: height 0.2s ease-in-out;
+  z-index: 3;
+}
+
+/* Estilos para o rótulo de temperatura */
+#termometer #temperature .temp-label {
+  display: none;
+}
+
+/* Estilos para o valor de temperatura com o valor exibido acima */
+#termometer #temperature::after {
+  content: attr(data-value);
+  position: absolute;
+  bottom: 100%;
+  left: 120%;
+  transform: translate(8px, 50%);
+  padding: 2px 6px;
+  background: #fff;
+  color: #000;
+  font-size: 12px;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Estilos para a escala do termômetro */
+#termometer .scale {
+  position: absolute;
+  top: 1%;
+  bottom: 10%;
+  left: 0;
+  width: 50%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Estilos para o indicador da escala no termômetro */
+#termometer .scale::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-image: repeating-linear-gradient(
+    to top,
+    #323237 0px,
+    #323237 2px,
+    transparent 2px,
+    transparent 100%
+  );
+  background-size: 100% 12%;
+}
+/* Estilos para o contêiner da bússola */
+.compass {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%,-50%);
+  background: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+/* Estilos para o SVG dentro da bússola */
+.compass svg {
+  position: absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+}
+
+/* Estilos para o conteúdo central da bússola */
+.compass-content {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 2;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  pointer-events: none;
+}
+
+/* Estilos para a unidade de medida no conteúdo da bússola */
+.compass-content .unit {
+  font-size: 24px;
+  font-weight: 300;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Estilos para otimizar a transformação do conteúdo */
+.will-transform {
+  will-change: transform;
+}
+
+/* Estilos para ajustar a posição do conteúdo da bússola */
+.compass-content {
+  top: calc(50% + 11px) !important;
+  left:150px;
+}
+
+/* Estilos para o valor da velocidade do vento */
+#wind-speed-value {
+  position: relative;
+  top: 2px;
+  left: 0;
+  display: block;
+  font-size: 60px;
+  line-height: 1;
+}
+
+/* Estilos para a unidade de medida ao lado do valor do vento */
+.unit {
+  position: relative;
+  top: -6px;
+  left: 24px;
+  font-size: 20px;
+  display: inline-block;
+}
+
+/* Estilos para o texto explicativo da meteorologia */
+.met-meaning-text {
+  position: absolute;
+  width: 240px;
+  white-space: normal;
+  text-align: justify;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+  pointer-events: none;
+  z-index: 150;
+}
+
+/* Estilos para o conteúdo após o texto explicativo da meteorologia */
+.met-meaning-text:after {
+  content: "";
+  display: inline-block;
+  width: 100%;
+}
+/* Estilos para a fonte do texto de significado (ex: significado de meteorologia) */
+.met-meaning-source {
+  display: block;
+  margin-top: 0.5em;
+  text-align: left;
+  font-size: 12px;
+  color: #ccc;
+}
+
+/* Estilos para a posição do significado da precipitação */
+#meaning-precip {
+  top: 15%;
+  left: 70%;
+}
+
+/* Estilos para a posição do significado da umidade */
+#meaning-umid {
+  top: 45%;
+  left: 70%;
+}
+
+/* Estilos para a posição do significado do vento */
+#meaning-vento {
+  top: 16%;
+  left: 70%;
+}
+
+/* Estilos para a posição do significado da temperatura */
+#meaning-temp {
+  top: 16%;
+  left: 70%;
+}
+
+/* Estilos para esconder o texto de significado */
+.met-meaning-text {
+  display: none;
+}
+
+/* Estilos para exibir o significado conforme a aba selecionada */
+#meteorologia-info.tab-1 #meaning-precip,
+#meteorologia-info.tab-1 #meaning-umid {
+  display: block;
+}
+
+#meteorologia-info.tab-2 #meaning-vento {
+  display: block;
+}
+
+#meteorologia-info.tab-3 #meaning-temp {
+  display: block;
+}
+
+/* Estilos para o conteúdo das estatísticas */
+.estatisticas-content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Estilos para o overlay das estatísticas */
+#stats-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  left: auto;
+  transform: none;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+}
+
+/* Estilos para o formulário das estatísticas */
+#stats-form {
+  position: absolute;
+  top: 20px;
+  right: 15px;
+  z-index: 1000;
+  background: rgb(39,39,39);
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: white;
+}
+
+/* Estilos para o seletor de métrica no formulário de estatísticas */
+.inline-estatisticas-view select#metric {
+  border-radius: 12px;
+}
+
+/* Estilos para o rótulo dentro do formulário de estatísticas */
+#stats-form label {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* Estilos para o seletor dentro do formulário de estatísticas */
+#stats-form select {
+  padding: 4px;
+}
+
+/* Estilos para a barra de modo lateral */
+.modebar-container {
+  right: auto !important;
+  left: 5px !important;
+  background: rgb(39,39,39);
+}
+
+/* Estilos para os botões de alternância (toggle) */
+.toggle-btn {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  margin-right: 8px;
+}
+
+/* Estilos para o estado ativo do botão de alternância */
+.toggle-btn.active {
+  background: white;
+  color: #272727;
+  border-color: white;
+}
+
+/* Estilos para o container do gráfico e o container cinza */
+#graph-container,
+#gray-container {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos para o container cinza */
+#gray-container {
+  background: #272727;
+}
+
+/* Estilos para o espaço reservado das estatísticas */
+.estatisticas-placeholder {
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+}
+
+/* Estilos para o gráfico das estatísticas */
+#estatisticas-plot {
+  position: relative;
+  z-index: 0;
+}
+
+/* Estilos para os botões das estatísticas */
+.estatisticas-buttons {
+  position: absolute;
+  top: 65%;
+  left: 22px;
+  display: flex;
+  gap: 8px;
+  z-index: 9999;
+  font-size: 14px;
+}
+
+/* Estilos para os botões das estatísticas em modo de gradiente */
+.estatisticas-buttons.gradient-mode {
+  top: 520px !important;
+  left: 22px;
+}
+
+/* Estilos gerais para os botões das estatísticas */
+.estatisticas-buttons {
+  background: transparent;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  display: flex;
+  gap: 5px;
+}
+
+/* Estilos para os botões toggle dentro das estatísticas */
+.estatisticas-buttons .toggle-btn {
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 5px;
+  border: 1px solid rgb(39,39,39);
+  background-color: rgb(39,39,39);
+  color: #fff;
+  position: relative;
+  top: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Estilos para o estado ativo do botão toggle dentro das estatísticas */
+.estatisticas-buttons .toggle-btn.active {
+  background-color: #555;
+  border-color: #555;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Estilos para o botão toggle quando não está ativo */
+.estatisticas-buttons .toggle-btn:hover:not(.active) {
+  background-color: #444;
+  border-color: #444;
+}
+
+/* Estilos para a imagem de gradiente dentro das estatísticas */
+.estatisticas-gradient-img {
+  max-height: 380px;
+  width: auto;
+  object-fit: contain;
+  transform: translateY(-80px);
+}
+
+/* Estilos para os botões de subgrade de gradiente */
+#gradient-sub-buttons {
+  position: absolute;
+  top: 55px !important;
+  right: 100px !important;
+  display: flex;
+  z-index: 1000;
+}
+
+/* Estilos para os botões de subgrade de gradiente */
+#gradient-sub-buttons .toggle-btn {
+  margin-right: 5px;
+  border: none;
+  background-color: #444;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.2s;
+}
+
+/* Estilos para o último botão de subgrade de gradiente */
+#gradient-sub-buttons .toggle-btn:last-child {
+  margin-right: 0;
+}
+
+/* Estilos para os botões de subgrade de gradiente ao passar o mouse */
+#gradient-sub-buttons .toggle-btn:hover {
+  background-color: #555;
+}
+
+/* Estilos para o estado ativo dos botões de subgrade de gradiente */
+#gradient-sub-buttons .toggle-btn.active {
+  background-color: #272727;
+}

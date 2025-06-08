@@ -1,0 +1,218 @@
+<!-- ============================================
+     Arquivo: base.html
+     --------------------------------------------
+     Template base que define a estrutura principal da aplicação:
+     - Cabeçalho (meta, favicon, CSS)
+     - Menu lateral fixo com navegação
+     - Conteúdo dinâmico (block content + views inline)
+     - Modal da esfera 3D
+     - Overlay de carregamento
+     - Inclusão de scripts JS
+   ============================================ -->
+   <!DOCTYPE html>
+   <html lang="pt-BR">
+   <head>
+     <!-- Metadados e viewport -->
+     <meta charset="UTF-8">
+     <title>{% block title %}Análise Ambiental{% endblock %}</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+     <!-- Prevent map flash: aplica quality-mode cedo -->
+     <script>
+      (function(){
+        // Lê o valor armazenado em localStorage na chave "view"
+        if (localStorage.getItem("view") === "quality") {
+          // Se o usuário deixou a visualização em "quality" na última visita,
+          // aplica imediatamente a classe que ajusta o tema para qualidade do ar
+          document.documentElement.classList.add("quality-mode");
+        }
+      })();
+    </script>
+   
+     <!-- Favicon personalizado -->
+     <link
+       rel="icon"
+       href="{{ url_for('static', filename='images/qualidade-ar-icon.png') }}"
+       type="image/png"
+     >
+   
+     <!-- Google Fonts: Inter -->
+     <link rel="stylesheet"
+           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+   
+     <!-- CSS Principais -->
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/utilities.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/views.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+   </head>
+   
+   <body data-classification="{{ 'true' if result else 'false' }}">
+   
+     <!-- ============================================
+          Menu lateral fixo
+          - Navegação principal: Mapa, IQAr, Meteorologia, Guia
+          - Submenus: Nova Visualização, Relatar um erro
+        ============================================ -->
+     <nav id="vertical-menu">
+       <div id="menu-container">
+         <h1 id="menu-title">Análise Ambiental</h1>
+   
+         <!-- Seção "Descubra" -->
+         <div class="menu-section">
+           <h2>Descubra</h2>
+           <ul>
+             <li>
+               <a href="/" id="map-trigger" class="active">
+                 <img src="{{ url_for('static', filename='images/mapa-icon.png') }}" alt="Mapa ícone">
+                 <span>Mapa</span>
+               </a>
+             </li>
+             <li>
+               <a href="#" id="iqar-trigger">
+                 <img src="{{ url_for('static', filename='images/qualidade-ar-icon.png') }}" alt="IQAr ícone">
+                 <span>Qualidade do Ar</span>
+               </a>
+             </li>
+             <li>
+               <a href="#" id="meteorologia-trigger">
+                 <img src="{{ url_for('static', filename='images/meteorologia-icon.png') }}" alt="Meteorologia ícone">
+                 <span>Meteorologia</span>
+               </a>
+             </li>
+             <li>
+               <a href="#" id="guide-trigger">
+                 <img src="{{ url_for('static', filename='images/guia-icon.png') }}" alt="Guia ícone">
+                 <span>Guia de usuário</span>
+               </a>
+             </li>
+           </ul>
+         </div>
+   
+         <!-- Seção "Mais" -->
+         <div class="menu-section">
+           <h2>Mais</h2>
+           <ul>
+   
+             <!-- ITEM "Nova Visualização" -->
+             <li class="has-submenu">
+               <a href="#" id="file-upload-trigger">
+                 <img src="{{ url_for('static', filename='images/nova-visualizacao-icon.png') }}" alt="Nova visualização">
+                 <span>Nova visualização</span>
+               </a>
+               <div class="submenu" id="file-upload-menu">
+                 <p class="submenu-title">Enviar arquivo</p>
+                 <button id="select-model-btn" class="submenu-button">Selecionar Modelo</button>
+                 <a href="{{ url_for('static', filename='dados/qar.xls') }}" download class="submenu-link">
+                   Baixe o Modelo de Exemplo
+                 </a>
+               </div>
+             </li>
+   
+             <!-- ITEM "Relatar um erro" -->
+             <li class="has-submenu">
+               <a href="#" id="error-report-trigger">
+                 <img src="{{ url_for('static', filename='images/relatar-erro-icon.png') }}" alt="Relatar um erro">
+                 <span>Relatar um erro</span>
+               </a>
+               <div class="submenu" id="error-submenu">
+                 <div id="error-submenu-content">
+                   <h3>Relate seu erro</h3>
+                   <div class="error-text-section">
+                     <label for="error-text">Descreva o problema (até 300 caracteres):</label>
+                     <textarea id="error-text" maxlength="300" rows="4"></textarea>
+                     <div class="char-counter-container">
+                       <span id="error-char-counter">300</span> caracteres restantes
+                     </div>
+                   </div>
+                   <div class="error-upload-section">
+                     <button id="error-upload-button" class="submenu-button">Anexar imagem (opcional)</button>
+                     <input type="file" id="error-upload-input" style="display:none;" accept="image/*">
+                   </div>
+                   <div class="error-submit-section">
+                     <button id="error-submit-button" class="submenu-button">Enviar Relatório</button>
+                   </div>
+                 </div>
+               </div>
+             </li>
+   
+           </ul>
+         </div>
+       </div>
+     </nav>
+   
+     <!-- input type="file" oculto, usado por JS para upload geral -->
+     <input type="file" id="upload-file-input" style="display: none;">
+   
+     <!-- ============================================
+          Conteúdo principal da página
+          - bloco `content` do Jinja
+          - views inline: Guia, Meteorologia, Qualidade do Ar
+        ============================================ -->
+     <div id="page-content">
+       {% block content %}{% endblock %}
+   
+       <!-- Inline Guide -->
+       <div id="inline-guide-view" class="hidden">
+         <button id="btn-back-from-guide"></button>
+         <div class="guide-content">
+           {% include 'guia.html' %}
+         </div>
+       </div>
+   
+       <!-- Inline Meteorologia -->
+       <div id="inline-meteorologia-view" class="hidden">
+         <button id="btn-back-from-meteorologia-view"></button>
+         <div class="meteorologia-page-content">
+           {% include 'explicacao_meteorologia.html' %}
+         </div>
+       </div>
+   
+       <!-- Inline Qualidade do Ar -->
+       <div id="inline-iqar-view" class="hidden">
+         <button id="btn-back-from-iqar"></button>
+         <div class="iqar-content">
+           {% include 'explicacao_iqar.html' %}
+         </div>
+       </div>
+     </div>
+   
+     <!-- ============================================
+          Modal da esfera 3D (Sphere) – sempre presente
+        ============================================ -->
+     <div id="sphere-modal" class="modal">
+       <div id="sphere-modal-content" class="modal-content">
+         <div id="sphere-container"></div>
+       </div>
+     </div>
+   
+     <!-- ============================================
+          Overlay de carregamento global
+        ============================================ -->
+     <div id="loading-overlay" class="overlay">
+       <div class="spinner"></div>
+     </div>
+   
+     <!-- ============================================
+          Inclusão de scripts JavaScript
+        ============================================ -->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+     <script src="{{ url_for('static', filename='js/formAndModalHelper.js') }}"></script>
+     <script src="{{ url_for('static', filename='js/libs/noise.min.js') }}"></script>
+     <script src="{{ url_for('static', filename='js/sphere.js') }}"></script>
+     <script src="{{ url_for('static', filename='js/uiHelpers.js') }}"></script>
+     <script src="{{ url_for('static', filename='js/togglePanels.js') }}"></script>
+     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+     <script src="{{ url_for('static', filename='js/viewModes.js') }}" defer></script>
+     <script src="{{ url_for('static', filename='js/vertical.js') }}" defer></script>
+     <script src="{{ url_for('static', filename='js/uiInteractions.js') }}" defer></script>
+     <script src="{{ url_for('static', filename='js/metModal.js') }}"></script>
+     <script src="https://threejs.org/examples/jsm/lines/LineGeometry.js"></script>
+     <script src="https://threejs.org/examples/jsm/lines/LineMaterial.js"></script>
+     <script src="https://threejs.org/examples/jsm/lines/Line2.js"></script>
+   </body>
+   </html>
+   
