@@ -1,9 +1,9 @@
 Flask==3.1.1
 Flask_Compress==1.17
 matplotlib==3.10.3
-numpy==2.3.0
+numpy==2.2.0
 openpyxl==3.1.5
-pandas==2.3.0
+pandas==2.2.3
 plotly==6.0.1
 pyexcel==0.7.1
 Werkzeug==3.1.3
