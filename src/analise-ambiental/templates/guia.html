@@ -1,0 +1,66 @@
+<!-- templates/guia.html -->
+
+<h3>Guia de Usuário</h3>
+
+<section id="mapa">
+  <h3>Mapa</h3>
+  <p>
+    O mapa da cidade de Itabira é o ponto de partida do sistema. À direita, estão posicionadas quatro Estações Automáticas de Monitoramento da Qualidade do Ar (EAMA), e à esquerda encontra-se a Estação Meteorológica EM11. Ao clicar em qualquer uma dessas estações, o usuário acessa a visualização correspondente. Esse mesmo acesso também pode ser feito pelos botões da seção “Explorar Dados” localizada abaixo do mapa.
+  </p>
+  <img
+    src="static/images/mapa1.webp"
+    alt="Ilustração do Mapa de Itabira"
+    style="max-width:100%; height:auto; margin-bottom:20px;"
+  >
+</section>
+
+<section id="qualidade-do-ar">
+  <h4>Qualidade do Ar</h4>
+  <p>
+    Nesta seção, o usuário pode utilizar o <em>seletor de data</em> para escolher o dia e a estação de monitoramento, obtendo os dados de qualidade do ar correspondentes. Para explorar informações detalhadas, clique em 
+    <a href="#" onclick="document.getElementById('iqar-trigger').click()">Qualidade do Ar</a> 
+    no menu lateral.
+  </p>
+</section>
+
+<section id="meteorologia">
+  <h4>Meteorologia</h4>
+  <p>
+    Nesta seção, o usuário pode utilizar o <em>seletor de data</em> para selecionar o dia e visualizar os valores de chuva, vento e temperatura registrados. Para acessar mais informações, clique em 
+    <a href="#" onclick="document.getElementById('meteorologia-trigger').click()">Meteorologia</a> 
+    no menu lateral.
+  </p>
+</section>
+
+<section id="estatisticas">
+  <h4>Estatísticas</h4>
+  <p>
+    Nesta seção, o usuário pode visualizar a média histórica dos valores registrados em cada estação ao longo dos anos. 
+    Além disso, há um espaço dedicado que exibe os valores máximos e mínimos medidos, permitindo comparar picos e vales das medições em cada local.
+  </p>
+</section>
+
+<hr>
+
+<section id="outros">
+  <h3>Outros</h3>
+
+  <section id="nova-visualizacao">
+    <h4>Nova Visualização</h4>
+    <p>
+      Esta funcionalidade está em desenvolvimento. Em breve, o usuário poderá carregar seus próprios dados e criar visualizações personalizadas diretamente no sistema. 
+      Enquanto isso, acompanhe o progresso desta ferramenta por meio do botão 
+      <strong>Nova Visualização</strong> no menu lateral.
+    </p>
+  </section>
+  
+  <section id="relatar-erro">
+    <h4>Relatar Erro</h4>
+    <p>
+      Caso você encontre algum problema ou inconsistência no sistema, utilize esta seção para enviar seu relatório. 
+      Abra o formulário integrado clicando no botão <strong>Relatar um erro</strong> no menu lateral. 
+      Nele, você poderá descrever detalhadamente o erro, anexar uma imagem se desejar e enviar diretamente ao suporte.
+    </p>
+  </section>
+  
+</section>

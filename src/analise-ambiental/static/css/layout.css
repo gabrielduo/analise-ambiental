@@ -1,0 +1,216 @@
+/**
+ * ====================================================================
+ * Arquivo: layout.css
+ * --------------------------------------------------------------------
+ * Estilos para:
+ * - Menu lateral vertical (tema, colapsável, responsivo)
+ * - Seções e itens do menu (títulos, links, ícones, hover/active)
+ * - Botão de alternância #menu-toggle
+ * - Submenus e controles de erro (forms, contador de caracteres)
+ * - Ajustes de layout (#page-content margin, .back-to-map)
+ * ====================================================================
+ */
+/* Variáveis de tema do menu */
+:root {
+    --menu-bg: #fff; --menu-border: #f3f3f3;
+    --menu-text: #242424; --menu-accent: #000;
+    --menu-hover-bg: #f3f3f3; --menu-active-bg: #f3f3f3;
+    --menu-icon-size: 28px; --menu-font: 'Inter',sans-serif;
+    --menu-padding: 16px; --menu-width: 290px;
+}
+
+/* Contêiner fixo do menu vertical (normal e colapsado) */
+#vertical-menu,
+#vertical-menu.collapsed {
+    position: fixed; top: 0; left: 0;
+    height: 100%; display: flex; flex-direction: column;
+    background: var(--menu-bg);
+    border-right: 1px solid var(--menu-border);
+    z-index: 1000; font: 18px var(--menu-font);
+    color: var(--menu-text);
+    transition: width .3s ease;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+
+/* Largura padrão e largura reduzida ao colapsar */
+#vertical-menu { width: var(--menu-width); }
+#vertical-menu.collapsed { width: 72px; }
+
+/* Estilo do título do menu (normal e colapsado) */
+#menu-title,
+#vertical-menu.collapsed #menu-title {
+    margin: var(--menu-padding);
+    padding: .5rem 1rem;
+    max-width: calc(var(--menu-width) - 2*var(--menu-padding));
+    font: 600 1.4rem var(--menu-font);
+    color: #000;
+    display: flex; justify-content: center; align-items: center;
+    position: relative; overflow: hidden; border-radius: 12px;
+    z-index: 1;
+}
+
+/* Pseudo-fundo expandido atrás do título ao hover */
+#menu-title::before {
+    content: "";
+    position: absolute; top: -25%; left: -25%;
+    width: 150%; height: 150%;
+    background: var(--menu-hover-bg);
+    border-radius: 12px; z-index: -1;
+}
+
+/* Hover no título e ocultar no menu colapsado */
+#menu-title:hover { background: var(--menu-active-bg); box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+#vertical-menu.collapsed #menu-title { opacity: 0; pointer-events: none; }
+
+/* Espaçamento entre seções do menu */
+.menu-section { margin-top: 1rem; }
+
+/* Estilo dos cabeçalhos das seções */
+.menu-section h2 {
+    margin: 0 0 .5rem var(--menu-padding);
+    font: 600 .85rem var(--menu-font);
+    color: #777; text-transform: uppercase;
+    letter-spacing: .05em; white-space: nowrap;
+    overflow: hidden; opacity: .8;
+}
+
+/* Ocultar cabeçalhos de seção no menu colapsado */
+#vertical-menu.collapsed .menu-section h2 { opacity: 0; }
+
+/* Reset de lista nas seções */
+.menu-section ul { list-style: none; margin:0; padding:0; }
+.menu-section li { margin: .25rem 0; } /* Espaçamento entre itens */
+
+/* Estilos comuns para links do menu (normal, hover e ativo) */
+.menu-section li a,
+.menu-section li a:hover,
+.menu-section li a.active {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .75rem var(--menu-padding);
+    text-decoration: none;
+    border-radius: .25rem;
+    transition: background .2s, color .2s;
+    white-space: nowrap; overflow: hidden;
+    color: var(--menu-text);
+}
+
+/* Estado hover dos links */
+.menu-section li a:hover { background: var(--menu-hover-bg); color: var(--menu-accent); }
+/* Estado ativo dos links */
+.menu-section li a.active { background: var(--menu-active-bg); font-weight: 600; }
+.menu-section li a.active:hover { color: var(--menu-text); }
+
+/* Estilo dos ícones dentro dos links */
+.menu-section li a img {
+    flex-shrink: 0;
+    width: var(--menu-icon-size);
+    height: var(--menu-icon-size);
+    object-fit: contain;
+    transition: transform .3s;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+}
+
+/* Efeito de hover nos ícones dos links */
+.menu-section li a:hover img { transform: scale(1.1); }
+
+/* Ajustes de padding e alinhamento no estado colapsado */
+#vertical-menu.collapsed .menu-section li a {
+    padding: .75rem 0; justify-content: center;
+}
+#vertical-menu.collapsed .menu-section li a span { display: none; }
+
+/* Botão de alternância do menu: gira ao colapsar */
+#menu-toggle {
+    margin: auto var(--menu-padding) var(--menu-padding);
+    align-self: center; background: none; border: none;
+    cursor: pointer; padding: .5rem; transition: transform .3s;
+}
+#menu-toggle svg { width: 24px; height: 24px; fill: var(--menu-text); }
+#vertical-menu.collapsed #menu-toggle { transform: rotate(180deg); }
+
+/* Responsividade: ajuste de largura do menu e margem do conteúdo */
+@media(max-width: 1024px) {
+#vertical-menu { width: 72px; }
+#page-content { margin-left: 72px; }
+}
+@media(min-width: 1025px) {
+#page-content { margin-left: var(--menu-width); }
+}
+#page-content { transition: margin-left .3s ease; }
+
+/* Botão "voltar ao mapa": seta e posicionamento */
+.back-to-map {
+    position: relative; padding-left: 36px !important;
+    color: #fff !important;
+}
+.back-to-map::before {
+    content: ""; position: absolute; top: 50%; left: 12px;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M6 1L3 4l3 3' fill='none' stroke='%23FFF' stroke-width='1'/%3E%3C/svg%3E") no-repeat center;
+}
+
+/* Contêiner de submenu: exibido ao abrir (.open) */
+.has-submenu { position: static; }
+.submenu {
+    display: none; flex-direction: column;
+    padding: 8px 16px; margin-top: 4px;
+    background: #f9f9f9; border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.1); width: auto;
+}
+.has-submenu.open > .submenu { display: flex !important; }
+
+/* Título do submenu */
+.submenu-title {
+    font: 600 .9rem var(--menu-font);
+    color: #333; margin-bottom: 8px;
+}
+
+/* Botões dentro do submenu */
+.submenu-button {
+    background: #444; color: #fff; border: none; border-radius: 4px;
+    padding: 6px 12px; font: bold .9rem var(--menu-font);
+    cursor: pointer; margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+    transition: background .2s, box-shadow .2s;
+}
+.submenu-button:hover { background: #555; box-shadow: 0 3px 6px rgba(0,0,0,.25); }
+
+/* Links dentro do submenu */
+.submenu-link {
+    display: block; color: #0066cc; font: bold .9rem var(--menu-font);
+    text-decoration: none; margin-bottom: 4px;
+}
+.submenu-link:hover { text-decoration: underline; }
+
+/* Área de conteúdo de erro dentro do submenu */
+    #error-submenu-content { padding: 8px; }
+    #error-submenu-content h3 {
+    font: 600 .9rem var(--menu-font);
+    color: #333; margin-bottom: 8px;
+}
+
+/* Textarea de erro: estilo e contadores */
+#error-text {
+    resize: none; width: 100%; box-sizing: border-box;
+    background: #444; color: #fff; padding: 6px;
+    border: 1px solid #555; border-radius: 4px;
+    font: .9rem var(--menu-font);
+}
+.error-text-section label {
+    font: .8rem var(--menu-font); color: #333;
+    margin-bottom: 4px; display: block;
+}
+.char-counter-container {
+    text-align: right; margin-top: 4px;
+    font: .75rem var(--menu-font); color: #666;
+}
+#error-char-counter {
+    font: .75rem var(--menu-font); color: #666;
+}
+#error-char-counter.exceeded { color: red; }
+.error-text-section,
+.error-upload-section,
+.error-submit-section { margin-bottom: 12px; }
+

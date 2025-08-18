@@ -1,0 +1,61 @@
+/* Sidebar retrátil – autodetect. Não altera seu tema; só adiciona comportamentos. */
+
+:root {
+  /* valores default; o JS sobrescreve com a largura real medida */
+  --sbw: 240px;     /* largura expandida */
+  --sbw-c: 64px;    /* largura recolhida */
+}
+
+.has-collapsible-sidebar nav.__sidebar {
+  position: relative;
+  overflow: visible;
+  width: var(--sbw);
+  transition: width .22s ease;
+  z-index: 20;
+}
+
+/* botão */
+nav.__sidebar .sidebar-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  border: none;
+  background: #2a2a2a;
+  color: #fff;
+  display: grid; place-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+nav.__sidebar .sidebar-toggle:hover { background:#3a3a3a; }
+nav.__sidebar .sidebar-toggle svg { width:14px; height:14px; }
+
+/* recolhido */
+.sidebar-collapsed nav.__sidebar { width: var(--sbw-c); }
+
+/* Esconde textos comuns do menu; deixa ícones (img/svg) visíveis */
+.sidebar-collapsed nav.__sidebar .menu-section h2,
+.sidebar-collapsed nav.__sidebar li span,
+.sidebar-collapsed nav.__sidebar #menu-title {
+  display:none !important;
+}
+
+/* Centraliza links quando recolhido */
+.sidebar-collapsed nav.__sidebar ul li a {
+  justify-content: center;
+}
+
+/* Conteúdo acompanha a largura do menu (o JS aplica .__content no wrapper) */
+.has-collapsible-sidebar .__content {
+  margin-left: var(--sbw);
+  transition: margin-left .22s ease;
+}
+.sidebar-collapsed .__content {
+  margin-left: var(--sbw-c);
+}
+
+/* Gira o chevron quando recolhido (‹ vira ›) */
+.sidebar-collapsed nav.__sidebar .sidebar-toggle svg {
+  transform: rotate(180deg);
+}
