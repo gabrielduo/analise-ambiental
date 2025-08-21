@@ -1,29 +1,26 @@
 // static/js/fileUpload.js
 // -------------------------------------------------------------------
-// Nova lógica de upload:
-// - Botão "Nova Visualização" > "Selecionar Modelo" (id: select-model-btn)
-// - Input oculto (id: upload-file-input)
-// - Valida nome do arquivo localmente: só 'qar.xls' ou 'met.xls'
-// - Envia via POST /api/upload-model
-// - Exibe mensagens claras de sucesso/erro
-// - NÃO altera outras funcionalidades
+// Fluxo de upload com senha:
+// 1) Clique no botão -> pede senha -> POST /api/upload-auth
+// 2) Recebe token curto -> abre seletor de arquivo
+// 3) Envia /api/upload-model com Authorization: Bearer <token>
+// Observação: mantém a validação original (somente 'qar.xls' ou 'met.xls').
 // -------------------------------------------------------------------
 
 (function () {
-  const pickBtn   = document.getElementById("select-model-btn");
+  const pickBtn   = document.getElementById("select-model-btn"); // troque para "file-upload-trigger" se for o teu id real
   const fileInput = document.getElementById("upload-file-input");
 
   if (!pickBtn || !fileInput) return;
 
-  // Força aceitar só .xls
+  // Força aceitar só .xls (mantido como estava)
   fileInput.setAttribute("accept", ".xls");
 
-  // Clique no botão abre o seletor
-  pickBtn.addEventListener("click", () => fileInput.click());
+  // Token temporário para upload (expira conforme back)
+  let uploadToken = null;
 
-  // Helper pra mensagens (substitua por seu toast caso exista)
+  // Helper de mensagens (troque por toast/snackbar se tiver)
   function notify(msg) {
-    // você pode trocar por um toast da sua UI
     alert(msg);
   }
 
@@ -32,25 +29,85 @@
     try { fileInput.value = ""; } catch (_) {}
   }
 
+  // Pede senha e obtém token do backend
+  async function askPasswordAndGetToken() {
+    const pwd = window.prompt("Digite a senha de upload:");
+    if (pwd === null) return null; // cancelado
+    try {
+      const resp = await fetch("/api/upload-auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pwd }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data?.ok) {
+        notify(data?.message || "Senha inválida.");
+        return null;
+      }
+      return data.token;
+    } catch (e) {
+      notify("Falha ao autenticar: " + e);
+      return null;
+    }
+  }
+
+  // Clique no botão: primeiro autentica, depois abre seletor
+  pickBtn.addEventListener("click", async (ev) => {
+    ev.preventDefault();
+    // Se não houver token, ou se quiser sempre renovar, peça novamente:
+    if (!uploadToken) {
+      uploadToken = await askPasswordAndGetToken();
+    }
+    if (!uploadToken) return; // cancelado ou falha
+
+    // Autenticado -> abrir seletor
+    fileInput.click();
+  });
+
+  // Validação do nome do arquivo (mantida)
+  function validateLocalFileName(file) {
+    const nameLower = (file.name || "").toLowerCase().trim();
+    return nameLower === "qar.xls" || nameLower === "met.xls";
+  }
+
+  // Envio do arquivo com Authorization: Bearer <token>
   fileInput.addEventListener("change", async (e) => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
 
-    const nameLower = (f.name || "").toLowerCase().trim();
-    if (nameLower !== "qar.xls" && nameLower !== "met.xls") {
+    if (!uploadToken) {
+      notify("Sessão de upload expirada. Clique em 'Selecionar Modelo' novamente e informe a senha.");
+      return resetInput();
+    }
+
+    if (!validateLocalFileName(f)) {
       notify("O arquivo deve se chamar exatamente 'qar.xls' ou 'met.xls'. Renomeie e tente de novo.");
       return resetInput();
     }
 
-    // Envio
     try {
       const fd = new FormData();
       fd.append("file", f);
 
-      const rsp = await fetch("/api/upload-model", {
+      let rsp = await fetch("/api/upload-model", {
         method: "POST",
+        headers: { "Authorization": `Bearer ${uploadToken}` },
         body: fd,
       });
+
+      // Se o token expirou, tenta 1x reautenticar e reenviar
+      if (rsp.status === 401) {
+        uploadToken = await askPasswordAndGetToken();
+        if (!uploadToken) {
+          resetInput();
+          return;
+        }
+        rsp = await fetch("/api/upload-model", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${uploadToken}` },
+          body: fd,
+        });
+      }
 
       let data = null;
       try {
@@ -59,9 +116,7 @@
         data = { ok: false, message: "Resposta inesperada do servidor." };
       }
 
-      // Tratamento por status
-      if (!rsp.ok || !data?.ok) {
-        // Mensagem vinda do backend, se houver
+      if (!rsp.ok || data?.ok === false) {
         const msg = (data && data.message) ? data.message : `Falha ao enviar (${rsp.status}).`;
         notify("❌ " + msg);
         return resetInput();

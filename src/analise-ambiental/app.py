@@ -11,18 +11,19 @@ Arquivo: app.py
 ============================================
 """
 import os
-from datetime import datetime
+from datetime import datetime, date
 import pandas as pd
-
+import sqlite3, time
 from flask import Flask, render_template, request, jsonify, send_file, make_response
 from flask_compress import Compress
 from werkzeug.utils import secure_filename
+from utils.mailer import send_error_email
 
 from config import (
     DATABASE_PATH,             # caminho do database_resumido.csv (qualidade do ar)
     NEW_DATABASE_PATH,         # caminho do new_database.csv (para gradientes)
     METEOROLOGY_PATH,          # caminho do database_met.csv
-    SQLALCHEMY_DATABASE_URI,   # (não usado aqui, mantido por compatibilidade)
+    SQLALCHEMY_DATABASE_URI,   
 )
 
 from utils.classifica import classify_air
@@ -51,7 +52,9 @@ try:
 except Exception:
     add_pts_update = None
 
-from utils.adiciona_ao_database_met import add_met_month_to_database  # <<<
+from utils.adiciona_ao_database_met import add_met_month_to_database  
+from utils.auth_upload import auth_bp, require_upload_token
+
 
 # ----------------------------------------------------------------------
 # Helpers
@@ -128,9 +131,67 @@ def _infer_year_month_from_dest_dir(dest_dir: str):
 app = Flask(__name__)
 Compress(app)
 
+
+# arquivo sqlite para contar envios por IP/dia
+RATE_DB = os.path.join(app.root_path, "rate_limit.db")
+
+def _rate_init():
+    """Cria a tabela de controle de envios por IP/dia (se não existir)."""
+    conn = sqlite3.connect(RATE_DB)
+    try:
+        c = conn.cursor()
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS errors_per_ip (
+                ip TEXT NOT NULL,
+                ymd TEXT NOT NULL,
+                count INTEGER NOT NULL DEFAULT 0,
+                last_ts REAL NOT NULL,
+                PRIMARY KEY (ip, ymd)
+            )
+        """)
+        # índice opcional por data (não é obrigatório)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_errors_per_ip_ymd ON errors_per_ip(ymd)")
+        conn.commit()
+    finally:
+        conn.close()
+
+def _rate_allow(ip: str, limit: int = 2) -> bool:
+    """
+    Incrementa e verifica o contador de hoje para o IP.
+    Retorna True se ainda estiver dentro do limite; False se estourou.
+    """
+    ymd = date.today().isoformat()
+    now = time.time()
+    conn = sqlite3.connect(RATE_DB)
+    try:
+        c = conn.cursor()
+        c.execute("SELECT count FROM errors_per_ip WHERE ip=? AND ymd=?", (ip, ymd))
+        row = c.fetchone()
+        if row is None:
+            c.execute(
+                "INSERT INTO errors_per_ip (ip, ymd, count, last_ts) VALUES (?, ?, 1, ?)",
+                (ip, ymd, now)
+            )
+            conn.commit()
+            return True
+        cnt = row[0]
+        if cnt >= limit:
+            return False
+        c.execute(
+            "UPDATE errors_per_ip SET count = count + 1, last_ts=? WHERE ip=? AND ymd=?",
+            (now, ip, ymd)
+        )
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+# inicializa a tabelinha na subida do app
+_rate_init()
+# ---------------------------------------------------------------------------
+
+app.register_blueprint(auth_bp)
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50 MB
-UPLOADS_FOLDER = os.path.join(app.root_path, "uploads")
-os.makedirs(UPLOADS_FOLDER, exist_ok=True)
 
 # evita cache só na rota de upload
 @app.after_request
@@ -281,6 +342,7 @@ def sobre_iqar():
 # API do uploader
 # ----------------------------------------------------------------------
 @app.route("/api/upload-model", methods=["POST"])
+@require_upload_token
 def api_upload_model():
     # Garantir que o uploader existe
     if handle_uploaded_model is None:
@@ -369,10 +431,6 @@ def api_upload_model():
 
     return jsonify(payload), 200
 
-
-# ----------------------------------------------------------------------
-# Report de erro (antigo)
-# ----------------------------------------------------------------------
 @app.route("/report_error", methods=["POST"])
 def report_error():
     error_text = request.form.get("error_text")
@@ -381,41 +439,42 @@ def report_error():
     if not error_text:
         return jsonify({"error": "O texto do erro é obrigatório."}), 400
 
-    existing = [
-        d
-        for d in os.listdir(UPLOADS_FOLDER)
-        if os.path.isdir(os.path.join(UPLOADS_FOLDER, d)) and d.startswith("error_")
-    ]
-    max_num = 0
-    for d in existing:
-        try:
-            num = int(d.split("_")[1])
-            if num > max_num:
-                max_num = num
-        except ValueError:
-            continue
+    # Rate limit: no máx. 2 envios por IP/dia
+    client_ip = (request.headers.get("X-Forwarded-For") or request.remote_addr or "").split(",")[0].strip()
+    if not _rate_allow(client_ip, limit=2):
+        return jsonify({"error": "Limite diário atingido para este IP (2 envios). Tente amanhã."}), 429
 
-    new_dir = os.path.join(UPLOADS_FOLDER, f"error_{max_num + 1}")
-    os.makedirs(new_dir, exist_ok=True)
+    # Monta assunto/corpo
+    subject = "[IQAR] Report de erro"
+    body = f"Novo report de erro recebido.\n\nTexto do erro:\n{error_text}\n"
 
-    error_txt = os.path.join(new_dir, "error.txt")
-    with open(error_txt, "w", encoding="utf-8") as f:
-        f.write(error_text)
+    # Anexo (somente em memória; nada é salvo em disco)
+    attachments = []
+    if error_file and error_file.filename:
+        filename = secure_filename(error_file.filename)
+        file_bytes = error_file.read()  # <- lê em memória
+        if file_bytes:
+            # (opcional) proteção de tamanho, ex.: 10MB
+            if len(file_bytes) > 10 * 1024 * 1024:
+                return jsonify({"error": "Anexo maior que 10MB."}), 400
+            attachments.append({
+                "filename": filename,
+                "data": file_bytes,
+                "content_type": error_file.mimetype or "application/octet-stream",
+            })
 
-    image_path = None
-    if error_file:
-        fn = secure_filename(error_file.filename)
-        image_path = os.path.join(new_dir, fn)
-        error_file.save(image_path)
-
-    return jsonify(
-        {
-            "message": "Erro reportado com sucesso!",
-            "error_dir": os.path.basename(new_dir),
-            "error_text_file": os.path.basename(error_txt),
-            "image_path": image_path and os.path.basename(image_path),
-        }
-    ), 200
+    # Envia
+    try:
+        send_error_email(subject, body, attachments)
+        return jsonify({
+            "message": "Erro reportado e enviado por e-mail com sucesso!",
+            "email": {"ok": True}
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "message": "Falha ao enviar o e-mail de erro.",
+            "email": {"ok": False, "message": str(e)}
+        }), 500
 
 @app.get("/database_resumido.csv")
 def serve_database_resumido():

@@ -1,0 +1,13 @@
+# Bancos locais (runtime)
+*.db
+*.sqlite
+*.sqlite3
+rate_limit.db
+
+# Segredos
+.env
+src/analise-ambiental/.env
+
+# Cache Python
+__pycache__/
+*.pyc

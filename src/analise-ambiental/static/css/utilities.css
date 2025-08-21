@@ -92,7 +92,7 @@ body::before {
     background-color: #FFF;
     width: 1200px;
     border: none;
-    border-radius: 16px;
+    border-radius: 26px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     position: relative;
     /* Ajuste para centralizar a janela */
@@ -169,7 +169,7 @@ body::before {
 .map-container {
     position: relative;
     overflow: hidden;
-    border-radius: 15px;
+    border-radius: 24px;
     width: 100%;
     height: auto;
     margin: 0;

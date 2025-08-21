@@ -164,18 +164,18 @@
 /* Título do submenu */
 .submenu-title {
     font: 600 .9rem var(--menu-font);
-    color: #333; margin-bottom: 8px;
+    color: #131313; margin-bottom: 8px;
 }
 
 /* Botões dentro do submenu */
 .submenu-button {
-    background: #444; color: #fff; border: none; border-radius: 4px;
+    background: #131313; color: #fff; border: none; border-radius: 12px;
     padding: 6px 12px; font: bold .9rem var(--menu-font);
     cursor: pointer; margin-bottom: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,.2);
     transition: background .2s, box-shadow .2s;
 }
-.submenu-button:hover { background: #555; box-shadow: 0 3px 6px rgba(0,0,0,.25); }
+.submenu-button:hover { background: #131313; box-shadow: 0 3px 6px rgba(0,0,0,.25); }
 
 /* Links dentro do submenu */
 .submenu-link {
@@ -188,14 +188,14 @@
     #error-submenu-content { padding: 8px; }
     #error-submenu-content h3 {
     font: 600 .9rem var(--menu-font);
-    color: #333; margin-bottom: 8px;
+    color: #131313; margin-bottom: 8px;
 }
 
 /* Textarea de erro: estilo e contadores */
 #error-text {
     resize: none; width: 100%; box-sizing: border-box;
-    background: #444; color: #fff; padding: 6px;
-    border: 1px solid #555; border-radius: 4px;
+    background: #131313; color: #fff; padding: 6px;
+    border: 1px solid #131313; border-radius: 4px;
     font: .9rem var(--menu-font);
 }
 .error-text-section label {

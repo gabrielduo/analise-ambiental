@@ -8,12 +8,19 @@ Inclui:
 - NEW_DATABASE_PATH, METEOROLOGY_PATH, etc.
 - DATA_ROOT      : raiz dos dados-coletados/<ano>/<mes>
 - UPLOAD_TMP     : pasta temporária para uploads
+- Vars de auth de upload lidas do .env (SECRET_KEY, UPLOAD_PASSWORD_HASH, TTL)
 ============================================
 """
 import os
+from dotenv import load_dotenv
 
-# pasta atual (analise-ambiental)
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# ------------------------------------------------------------
+# Carrega .env localizado na MESMA PASTA deste arquivo
+# (analise-ambiental/src/analise-ambiental/.env)
+# ------------------------------------------------------------
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # pasta atual (analise-ambiental)
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
 # sobe para a raiz do src
 SRC_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
 
@@ -52,3 +59,24 @@ os.makedirs(UPLOAD_TMP, exist_ok=True)
 
 # Banco local para relatórios de erro
 SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///error_reports.db")
+
+# ------------------------------------------------------------
+# Auth de upload (lidas do ambiente / .env) — NADA de segredo no código
+# ------------------------------------------------------------
+# Chave usada para assinar tokens de upload (obrigatório em prod)
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
+
+# Hash bcrypt da senha de upload (obrigatório em prod)
+UPLOAD_PASSWORD_HASH = os.getenv("UPLOAD_PASSWORD_HASH", "")
+
+# Tempo de vida do token (segundos) — ex.: 600 = 10 min
+UPLOAD_TOKEN_TTL_SECONDS = int(os.getenv("UPLOAD_TOKEN_TTL_SECONDS", "600"))
+
+# ---------------- SMTP / Error Report ----------------
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").strip().lower() in ("1", "true", "yes", "on")
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASS = os.getenv("SMTP_PASS", "")
+ERROR_REPORT_TO = os.getenv("ERROR_REPORT_TO", "")
+ERROR_REPORT_FROM = os.getenv("ERROR_REPORT_FROM", SMTP_USER or "noreply@localhost")

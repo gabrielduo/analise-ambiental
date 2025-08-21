@@ -7,6 +7,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  window.__statsOverlayActive = true;
   const form = document.getElementById("classification-form");
 
   // Triggers que levam para Estatísticas (ajuste ids se precisar)

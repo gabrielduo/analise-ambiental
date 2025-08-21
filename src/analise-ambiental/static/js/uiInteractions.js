@@ -258,18 +258,21 @@ document.addEventListener("DOMContentLoaded", () => {
     btnQualidade && (btnQualidade.onclick = e => { e.preventDefault(); openQualityView(); });
     btnMet && (btnMet.onclick = e => { e.preventDefault(); openMeteorologiaView(); });
   
-    // Mudança de visualização para as estatísticas
-    btnEstatisticas && (btnEstatisticas.onclick = e => {
-      e.preventDefault();
-      openEstatisticasView();
-  
-      // Força o selector para MP10 e dispara o change -> submit
-      const metricSelect = document.getElementById("metric");
-      if (metricSelect) {
-        metricSelect.value = "mp10";
-        metricSelect.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    });
+    // Mudança de visualização para as estatísticas (sem submit/reload)
+    if (!window.__statsOverlayActive) {
+      btnEstatisticas && (btnEstatisticas.onclick = e => {
+        e.preventDefault();
+        // Reusa exatamente o mesmo caminho que o trigger oficial
+        const native = document.getElementById("estatisticas-trigger");
+        if (native) {
+          native.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+        } else {
+          // fallback se não existir trigger nativo
+          if (typeof openEstatisticasView === "function") openEstatisticasView();
+        }
+      });
+    }
+
   
     // "Voltar ao Mapa" interno
     document.querySelectorAll(".back-to-map")
